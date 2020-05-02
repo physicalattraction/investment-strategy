@@ -37,7 +37,12 @@ class Stock:
         return (self.expected_value - self.current_value) / self.current_value
 
     def as_dict(self) -> Dict[str, Any]:
-        return self.__dict__
+        return {
+            'ticker': self.ticker,
+            'name': self.name,
+            'current_value': self.current_value.quantize(Decimal('0.01')),
+            'expected_value': self.expected_value.quantize(Decimal('0.01')),
+        }
 
 
 @dataclass
@@ -62,7 +67,7 @@ class Position:
     def as_dict(self) -> Dict[str, Any]:
         result = self.stock.as_dict()
         result['quantity'] = self.quantity
-        result['value'] = self.value
+        result['value'] = self.value.quantize(Decimal('0.01'))
         result['fraction'] = self.fraction.quantize(Decimal('0.0001'))
         return result
 
@@ -118,6 +123,7 @@ class Portfolio:
                 except (TypeError, InvalidOperation):
                     # We ignore rows that cannot be interpreted as a Position, e.g. total row
                     continue
+        result.calculate_fractions()
         return result
 
     def write_to_file(self, filename: str):
@@ -135,5 +141,5 @@ class Portfolio:
             writer.writeheader()
             writer.writerows([position.as_dict() for position in self.positions])
             writer.writerow({'ticker': 'Total', 'name': None, 'current_value': None, 'expected_value': None,
-                             'quantity': self.total_quantity, 'value': self.total_value,
+                             'quantity': self.total_quantity, 'value': self.total_value.quantize(Decimal('0.01')),
                              'fraction': self.total_fraction.quantize(Decimal('0.0001'))})

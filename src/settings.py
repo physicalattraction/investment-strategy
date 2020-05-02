@@ -4,5 +4,6 @@ SRC_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(SRC_DIR)
 
 PORTFOLIO_DIR = os.path.join(ROOT_DIR, 'portfolios')
+SIMULATION_DIR = os.path.join(ROOT_DIR, 'simulations')
 TEST_DIR = os.path.join(ROOT_DIR, 'test')
 TMP_DIR = os.path.join(ROOT_DIR, 'tmp')
