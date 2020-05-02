@@ -14,7 +14,7 @@ class Calculator:
         # Calculate ideal ideal_fraction
         for position in self.portfolio.positions:
             position.ideal_fraction = position.stock.expected_earnings / self.portfolio.total_expected_earnings
-        self._account_for_max_position()
+        self._redistribute_over_max()
 
         # Reset the current value to the ideal value
         total_value = self.portfolio.total_value
@@ -23,7 +23,7 @@ class Calculator:
 
         self.portfolio.calculate_fractions()
 
-    def _account_for_max_position(self):
+    def _redistribute_over_max(self):
         # Check if the max position can be reached with the number of positions
         nr_positions = len(self.portfolio.positions)
         if nr_positions * self.max_position < 1:
@@ -52,7 +52,7 @@ class Calculator:
             position.ideal_fraction += position.ideal_fraction / total_ideal_fraction_under_max * total_ideal_fraction_to_redistribute
 
         # Repeat the procedure until no position is above the maximum position
-        self._account_for_max_position()
+        self._redistribute_over_max()
 
 
 if __name__ == '__main__':

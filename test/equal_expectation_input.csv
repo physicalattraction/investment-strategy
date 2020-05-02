@@ -1,0 +1,5 @@
+"ticker","name","current_value","expected_value","quantity"
+"A","A",10.00,20.00,200
+"B","B",20.00,40.00,300
+"C","C",30.00,60.00,400
+"D","D",40.00,80.00,500
