@@ -1,3 +1,4 @@
+import argparse
 from decimal import Decimal
 
 from models import Portfolio
@@ -56,7 +57,12 @@ class Calculator:
 
 
 if __name__ == '__main__':
-    _portfolio = Portfolio.read_from_file('demo.csv')
+    parser = argparse.ArgumentParser(description='Calculator')
+    parser.add_argument('--input', help='name of input portfolio CSV file. Defaults to demo.csv', default='demo.csv')
+    parser.add_argument('--output', help='name of output portfolio CSV file. Defaults to ideal.csv', default='ideal.csv')
+    args = parser.parse_args()
+
+    _portfolio = Portfolio.read_from_file(args.input)
     calculator = Calculator(_portfolio)
     calculator.calculate_ideal_portfolio()
-    _portfolio.write_to_file('ideal.csv')
+    _portfolio.write_to_file(args.output)

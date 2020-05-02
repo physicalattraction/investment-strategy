@@ -1,21 +1,23 @@
+import argparse
 import os.path
-from decimal import Decimal
-from enum import Enum
 import random
+from decimal import Decimal
 
 import settings
 from calculator import Calculator
 from models import Portfolio
 
 
-class SimulationId(Enum):
-    UP_AND_DOWN = 'up_and_down'
-
-
 class Simulator:
-    def __init__(self, input_simulation: SimulationId):
-        self.input_simulation = input_simulation
-        self.data_dir = os.path.join(settings.SIMULATION_DIR, input_simulation.value)
+    SCENARIO_UP_AND_DOWN = 'up_and_down'
+    SCENARIOS = {SCENARIO_UP_AND_DOWN}
+
+    def __init__(self, scenario: str):
+        if scenario not in self.SCENARIOS:
+            raise NotImplementedError(f'Unknown scenario {scenario}. Choose from: {sorted(self.SCENARIOS)}')
+
+        self.scenario = scenario
+        self.data_dir = os.path.join(settings.SIMULATION_DIR, scenario)
         self.portfolio = Portfolio.read_from_file(os.path.join(self.data_dir, 'start.csv'))
         self.reference_portfolio = Portfolio.read_from_file(os.path.join(self.data_dir, 'start.csv'))
 
@@ -34,7 +36,7 @@ class Simulator:
         calculator.calculate_ideal_portfolio()
 
     def _update_reality(self, step: int):
-        if self.input_simulation == SimulationId.UP_AND_DOWN:
+        if self.scenario == self.SCENARIO_UP_AND_DOWN:
             # In odd steps, the price goes down. In even steps, the price goes up.
             # The stocks with the highest expected earnings will fluctuate the most.
             # One out of four steps we expect a loss 20%-40%, the other steps we expect a gain 10-30%
@@ -49,5 +51,12 @@ class Simulator:
 
 
 if __name__ == '__main__':
-    simulator = Simulator(SimulationId.UP_AND_DOWN)
-    simulator.start_simulation()
+    parser = argparse.ArgumentParser(description='Calculator')
+    parser.add_argument('--scenario', type=str, default=Simulator.SCENARIO_UP_AND_DOWN,
+                        help=f'Name of scenario. Choose from: {sorted(Simulator.SCENARIOS)}. Defaults to up_and_down')
+    parser.add_argument('--steps', type=int, default=10,
+                        help='Number of steps in the simulation. Defaults to 10')
+    args = parser.parse_args()
+
+    simulator = Simulator(args.scenario)
+    simulator.start_simulation(args.steps)
